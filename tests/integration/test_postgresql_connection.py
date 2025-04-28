@@ -49,7 +49,7 @@ def test_postgresql_connection_failure():
         )
 
 
-@patch("psycopg2.connect", side_effect=OperationalError("Erro simulado na conexão"))
+@patch("psycopg2.connect", side_effect=OperationalError("Erro na conexão"))
 def test_db_connection_fixture_failure(mock_connect):
     """Testa falha no momento de usar a fixture db_connection"""
     with pytest.raises(Failed):
