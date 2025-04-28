@@ -93,7 +93,7 @@ jobs:
 
   notify:
     name: "Notificação"
-    if: always()
+    if: false
     needs: [lint, security]
     runs-on: ubuntu-latest
     steps:
