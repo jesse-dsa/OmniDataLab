@@ -84,7 +84,7 @@ jobs:
 
       - name: Salvar relatório de testes (se falhar)
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: test-results-py${{ matrix.python-version }}
           path: |
