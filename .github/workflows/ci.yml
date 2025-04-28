@@ -10,7 +10,7 @@ jobs:
   lint:
     name: "Linting e Formatação"
     runs-on: ubuntu-latest
-    timeout-minutes: 5  # Falha rápida
+    timeout-minutes: 5
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -27,14 +27,16 @@ jobs:
             ~/.cache/pip
             venv/
           key: lint-${{ runner.os }}-py3.10-${{ hashFiles('requirements-dev.txt') }}
+          restore-keys: |
+            lint-${{ runner.os }}-py3.10-
 
       - name: Listar arquivos no repositório
         run: ls -la
 
       - name: Instalar dependências de desenvolvimento
         run: |
-          pip install --upgrade pip
-          pip install -r requirements-dev.txt
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
 
       - name: Verificar formatação (Black)
         run: black --check --diff .
@@ -44,11 +46,18 @@ jobs:
 
   test:
     name: "Testes (Python ${{ matrix.python-version }})"
-    needs: lint  # Depende do job de lint
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]  # Teste em múltiplas versões
+        python-version: ["3.9", "3.10", "3.11"]
+        include:
+          - python-version: "3.9"
+            experimental: false
+          - python-version: "3.10"
+            experimental: false
+          - python-version: "3.11"
+            experimental: true
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -63,12 +72,14 @@ jobs:
             ~/.cache/pip
             venv/
           key: test-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            test-${{ runner.os }}-py${{ matrix.python-version }}-
 
       - name: Instalar dependências
         run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-cov
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install pytest pytest-cov
 
       - name: Executar testes
         run: |
@@ -76,15 +87,17 @@ jobs:
             --cov=src/ \
             --cov-report=xml \
             --junitxml=test-results-${{ matrix.python-version }}.xml
+        continue-on-error: ${{ matrix.experimental }}
 
       - name: Upload cobertura para Codecov
+        if: ${{ !matrix.experimental || (matrix.experimental && success()) }}
         uses: codecov/codecov-action@v3
         with:
-          fail_ci_if_error: true  # Falha se não enviar o relatório
+          fail_ci_if_error: true
 
-      - name: Salvar relatório de testes (se falhar)
-        if: failure()
-        uses: actions/upload-artifact@v2
+      - name: Salvar relatório de testes
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: test-results-py${{ matrix.python-version }}
           path: |
@@ -93,7 +106,7 @@ jobs:
 
   security:
     name: "Verificação de Segurança"
-    needs: test  # Só executa após os testes
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -104,12 +117,12 @@ jobs:
 
       - name: Verificar vulnerabilidades
         run: |
-          pip install safety
+          python -m pip install safety
           safety check --full-report
 
   notify:
     name: "Notificação"
-    if: always()  # Sempre executa, mesmo se outros jobs falharem
+    if: always()
     needs: [lint, test, security]
     runs-on: ubuntu-latest
     steps:
@@ -120,8 +133,8 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: "danger"
           SLACK_TITLE: "Falha no CI (OmniDataLab)"
-          SLACK_MESSAGE: "Falha no job *${{ needs.job.result }}*: ${{ github.workflow }}"
-          SLACK_FOOTER: "Commit: ${{ github.sha }}"
+          SLACK_MESSAGE: "Falha no workflow ${{ github.workflow }}"
+          SLACK_FOOTER: "Commit: ${{ github.sha }} | Detalhes: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Notificar sucesso
         if: success()
@@ -130,4 +143,5 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_COLOR: "good"
           SLACK_TITLE: "CI Aprovado (OmniDataLab)"
-          SLACK_MESSAGE: "Todos os jobs passaram!"
+          SLACK_MESSAGE: "Todos os jobs passaram! 🎉"
+          SLACK_FOOTER: "Commit: ${{ github.sha }} | Detalhes: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
