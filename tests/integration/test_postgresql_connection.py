@@ -19,10 +19,7 @@ def db_connection():
         yield connection
         connection.close()
     except OperationalError as e:
-        pytest.fail(
-            "Falha ao estabelecer conexão com o banco de dados: "
-            f"{str(e)}"
-        )
+        pytest.fail(f"Falha ao estabelecer conexão com o banco de dados: {str(e)}")
 
 
 # Teste de conexão bem-sucedida
@@ -55,10 +52,7 @@ def test_postgresql_connection_failure():
 
 
 # Teste forçando a fixture a falhar (mockando psycopg2.connect)
-@patch(
-    "psycopg2.connect",
-    side_effect=OperationalError("Erro simulado na conexão"),
-)
+@patch("psycopg2.connect", side_effect=OperationalError("Erro simulado na conexão"))
 def test_db_connection_fixture_failure(mock_connect):
     """Testa falha no momento de usar a fixture db_connection"""
     # Chamamos manualmente para capturar o erro do yield
