@@ -1,0 +1,130 @@
+name: CI - OmniDataLab (Otimizado)
+
+on:
+  push:
+    branches: ["main", "dev"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  lint:
+    name: "Linting e Formatação"
+    runs-on: ubuntu-latest
+    timeout-minutes: 5  # Falha rápida
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Cache de dependências
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            venv/
+          key: lint-${{ runner.os }}-py3.10-${{ hashFiles('**/requirements-dev.txt') }}
+
+      - name: Instalar dependências de desenvolvimento
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Verificar formatação (Black)
+        run: black --check --diff .
+
+      - name: Verificar estilo (Flake8)
+        run: flake8 . --show-source --statistics
+
+  test:
+    name: "Testes (Python ${{ matrix.python-version }})"
+    needs: lint  # Depende do job de lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]  # Teste em múltiplas versões
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            venv/
+          key: test-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+
+      - name: Instalar dependências
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+
+      - name: Executar testes
+        run: |
+          pytest tests/ \
+            --cov=src/ \
+            --cov-report=xml \
+            --junitxml=test-results-${{ matrix.python-version }}.xml
+
+      - name: Upload cobertura para Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true  # Falha se não enviar o relatório
+
+      - name: Salvar relatório de testes (se falhar)
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results-py${{ matrix.python-version }}
+          path: |
+            test-results-${{ matrix.python-version }}.xml
+            coverage.xml
+
+  security:
+    name: "Verificação de Segurança"
+    needs: test  # Só executa após os testes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Verificar vulnerabilidades
+        run: |
+          pip install safety
+          safety check --full-report
+
+  notify:
+    name: "Notificação"
+    if: always()  # Sempre executa, mesmo se outros jobs falharem
+    needs: [lint, test, security]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Notificar Slack
+        if: failure()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: "danger"
+          SLACK_TITLE: "Falha no CI (OmniDataLab)"
+          SLACK_MESSAGE: "Falha no job *${{ needs.job.result }}*: ${{ github.workflow }}"
+          SLACK_FOOTER: "Commit: ${{ github.sha }}"
+
+      - name: Notificar sucesso
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_COLOR: "good"
+          SLACK_TITLE: "CI Aprovado (OmniDataLab)"
+          SLACK_MESSAGE: "Todos os jobs passaram!"
