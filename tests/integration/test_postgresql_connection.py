@@ -18,13 +18,8 @@ def db_connection():
         yield connection
         connection.close()
     except OperationalError as e:
-<<<<<<< HEAD
         msg = "Falha na conexão com o banco de dados"
         pytest.fail(f"{msg}: {str(e)}")
-=======
-        msg = "Falha ao estabelecer conexão com o banco de dados: "
-        pytest.fail(f"{msg}{str(e)}")
->>>>>>> 545aaaca43fd2592770de419e0169a905ffa9487
 
 
 def test_postgresql_connection_success(db_connection):
