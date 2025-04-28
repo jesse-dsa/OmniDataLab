@@ -1,0 +1,6 @@
+# Configurações de conexão com o banco PostgreSQL
+host: "127.0.0.1"
+port: 5432
+dbname: "vtex_catalog"
+user: "postgres"
+password: "Jotta@1440"
