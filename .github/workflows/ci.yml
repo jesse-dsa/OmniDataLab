@@ -65,7 +65,7 @@ jobs:
 
       - name: Rodar teste de conexão com o PostgreSQL
         run: |
-          python -m pytest tests/integration/test_postgresql_connection.py
+          python -m pytest tests/integration/test_postgresql_connection.py  # Sem cobertura para este teste específico
 
   test:
     name: "Testes (Python ${{ matrix.python-version }})"
@@ -104,9 +104,9 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pytest pytest-cov
 
-      - name: Executar testes
+      - name: Executar testes com cobertura
         run: |
-          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml
+          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml  # Rodando todos os testes com cobertura
         continue-on-error: ${{ matrix.experimental }}
 
       - name: Upload cobertura para Codecov
