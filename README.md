@@ -4,7 +4,7 @@ O **OmniDataLab** é um laboratório de dados aberto, focado em construir uma ar
 
 Nosso objetivo é criar pipelines de dados modernos, aplicar machine learning de forma prática para otimização de vendas, e promover governança e auditoria contínua de dados em ambientes digitais complexos.
 
-Este projeto é **público** e **aberto a contribuições**!  
+Este projeto é **público** e **aberto a contribuições**!
 Buscamos sempre melhorias em: arquitetura de dados, automação de pipelines, práticas de engenharia, ciência de dados, pesquisa operacional e otimização de processos de e-commerce.
 
 ## 🚀 Tecnologias
