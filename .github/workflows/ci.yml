@@ -46,36 +46,35 @@ jobs:
         run: flake8 . --show-source --statistics
 
   test_postgresql_connection:
-  name: Teste de Conexão com PostgreSQL
-  runs-on: ubuntu-latest
-  services:
-    postgres:
-      image: postgres:13
-      env:
-        POSTGRES_PASSWORD: Jotta@1440
-        POSTGRES_DB: vtex_catalog
-      ports:
-        - 5432:5432
-      options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    name: Teste de Conexão com PostgreSQL
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_PASSWORD: Jotta@1440
+          POSTGRES_DB: vtex_catalog
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
-  steps:
-    - name: Checkout do código
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-    - name: Configurar Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.10"
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
 
-    - name: Instalar dependências
-      run: |
-        pip install psycopg2-binary pytest
+      - name: Instalar dependências
+        run: |
+          pip install psycopg2-binary pytest
 
-    - name: Rodar teste de conexão
-      run: |
-        # Comando modificado para ignorar completamente a configuração do pytest.ini
-        python -m pytest tests/integration/test_postgresql_connection.py -p no:cov -c /dev/null
-        
+      - name: Rodar teste de conexão com o PostgreSQL
+        run: |
+          python -m pytest tests/integration/test_postgresql_connection.py -p no:cov -c /dev/null
+
   test:
     name: "Testes (Python ${{ matrix.python-version }})"
     needs: lint
@@ -115,7 +114,7 @@ jobs:
 
       - name: Executar testes com cobertura
         run: |
-          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml  # Rodando todos os testes com cobertura
+          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml
         continue-on-error: ${{ matrix.experimental }}
 
       - name: Upload cobertura para Codecov
