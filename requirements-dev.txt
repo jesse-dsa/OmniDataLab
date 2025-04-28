@@ -3,3 +3,4 @@ flake8
 pytest
 pytest-cov
 safety>=3.0.0
+psycopg2-binary
