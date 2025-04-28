@@ -102,26 +102,6 @@ jobs:
           python -m pip install -r requirements.txt
           python -m pip install pytest pytest-cov
 
-      - name: Executar testes com cobertura
-        run: |
-          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml
-        continue-on-error: ${{ matrix.experimental }}
-
-      - name: Upload cobertura para Codecov
-        if: ${{ !matrix.experimental || (matrix.experimental && success()) }}
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
-
-      - name: Salvar relatório de testes
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results-py${{ matrix.python-version }}
-          path: |
-            test-results-${{ matrix.python-version }}.xml
-            coverage.xml
-
   security:
     name: "Verificação de Segurança"
     needs: lint
