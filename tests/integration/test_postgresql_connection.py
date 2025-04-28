@@ -2,7 +2,7 @@ import psycopg2
 import pytest
 from psycopg2 import OperationalError
 from unittest.mock import patch
-from _pytest.outcomes import Failed  # ✅ Correto para capturar falha de pytest.fail
+from _pytest.outcomes import Failed
 
 
 # Fixture para conexão segura com tratamento de erro
