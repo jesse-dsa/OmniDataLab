@@ -74,7 +74,7 @@ def create_project_structure(base_path="."):
             else:
                 os.makedirs(os.path.dirname(child_path), exist_ok=True)
                 if not os.path.exists(child_path):
-                    with open(child_path, "w", encoding="utf-8") as f:
+                    with open(child_path, "w", encoding="utf-8"):
                         pass
                     print(f"📄 Arquivo criado: {child_path}")
 
