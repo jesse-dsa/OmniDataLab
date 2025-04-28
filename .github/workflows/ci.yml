@@ -166,4 +166,8 @@ jobs:
           SLACK_COLOR: "good"
           SLACK_TITLE: "CI Aprovado (OmniDataLab)"
           SLACK_MESSAGE: "Todos os jobs passaram! 🎉"
+<<<<<<< HEAD
           SLACK_FOOTER: "Commit: ${{ github.sha }} | Detalhes: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+=======
+          SLACK_FOOTER: "Commit: ${{ github.sha }} | Detalhes: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+>>>>>>> 00bd753ef0c74f5a2c8a5eac6499218a6cb4c966
