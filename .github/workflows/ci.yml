@@ -26,7 +26,10 @@ jobs:
           path: |
             ~/.cache/pip
             venv/
-          key: lint-${{ runner.os }}-py3.10-${{ hashFiles('**/requirements-dev.txt') }}
+          key: lint-${{ runner.os }}-py3.10-${{ hashFiles('requirements-dev.txt') }}
+
+      - name: Listar arquivos no repositório
+        run: ls -la
 
       - name: Instalar dependências de desenvolvimento
         run: |
@@ -59,7 +62,7 @@ jobs:
           path: |
             ~/.cache/pip
             venv/
-          key: test-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+          key: test-${{ runner.os }}-py${{ matrix.python-version }}-${{ hashFiles('requirements.txt') }}
 
       - name: Instalar dependências
         run: |
@@ -94,7 +97,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+     
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
