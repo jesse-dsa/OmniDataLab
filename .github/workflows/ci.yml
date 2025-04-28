@@ -65,7 +65,7 @@ jobs:
 
       - name: Rodar teste de conexão com o PostgreSQL
         run: |
-          python -m pytest tests/integration/test_postgresql_connection.py no:cov # Sem cobertura para este teste específico
+          python -m pytest tests/integration/test_postgresql_connection.py -p no:cov # Sem cobertura para este teste específico
 
   test:
     name: "Testes (Python ${{ matrix.python-version }})"
