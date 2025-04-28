@@ -1,0 +1,89 @@
+# ============================================
+# OmniDataLab - .gitignore
+# ============================================
+
+# ─── Arquivos Python ───────────────────────────
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+
+# ─── Configurações de IDE ──────────────────────
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# ─── Ambientes Virtuais ────────────────────────
+.env/
+.venv/
+venv/
+ENV/
+env.bak/
+env/
+
+# ─── Arquivos de Configuração Sensíveis ────────
+*.env
+.env.* 
+!.env.template    # Deixa só o template versionado
+secrets.json
+config/secrets/
+
+# ─── Logs e Temporários ─────────────────────────
+*.log
+*.out
+*.bak
+*.tmp
+*.swp
+*.swo
+
+# ─── Arquivos de Sistema ────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─── Docker ─────────────────────────────────────
+docker-compose.override.yml
+docker-compose.dev.yml
+.docker/
+**/docker-compose.override.yml
+
+# ─── Airflow ────────────────────────────────────
+airflow/logs/
+dags/__pycache__/
+
+# ─── Jupyter Notebooks ──────────────────────────
+.ipynb_checkpoints/
+
+# ─── Terraform ──────────────────────────────────
+*.tfstate
+*.tfstate.*
+.terraform/
+*.backup
+
+# ─── Testes e Dados Temporários ─────────────────
+tests/data/
+data/staged/
+data/processed/
+data/feature_store/
+
+# ─── Backup de arquivos ─────────────────────────
+*.bak
+*.bkp
+*~
+
+# ─── Build / Distribuição ───────────────────────
+build/
+dist/
+*.egg-info/
+
+# ─── Arquivos de Auditoria de CI/CD ─────────────
+coverage.xml
+htmlcov/
+reports/
+audit/reports/
+
+# ─── Outros ─────────────────────────────────────
+logs/
+temp/
+.cache/
