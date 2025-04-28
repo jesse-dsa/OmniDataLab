@@ -48,7 +48,6 @@ jobs:
   test_postgresql_connection:
     name: Teste de Conexão com PostgreSQL
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout do código
         uses: actions/checkout@v4
@@ -60,12 +59,15 @@ jobs:
 
       - name: Instalar dependências
         run: |
-          pip install psycopg2-binary
-          pip install pytest
-
+          pip install psycopg2-binary pytest
+          
       - name: Rodar teste de conexão com o PostgreSQL
         run: |
-          python -m pytest tests/integration/test_postgresql_connection.py -p no:cov # Sem cobertura para este teste específico
+          # Solução definitiva: cria ambiente limpo sem configurações de cobertura
+          TEMP_DIR=$(mktemp -d)
+          cp -r tests/integration/test_postgresql_connection.py $TEMP_DIR/
+          cd $TEMP_DIR
+          python -m pytest test_postgresql_connection.py
 
   test:
     name: "Testes (Python ${{ matrix.python-version }})"
@@ -106,7 +108,7 @@ jobs:
 
       - name: Executar testes com cobertura
         run: |
-          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml  # Rodando todos os testes com cobertura
+          pytest tests/ --cov=src --cov-report=xml --junitxml=test-results-${{ matrix.python-version }}.xml
         continue-on-error: ${{ matrix.experimental }}
 
       - name: Upload cobertura para Codecov
